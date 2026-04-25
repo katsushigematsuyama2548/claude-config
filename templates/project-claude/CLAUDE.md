@@ -2,25 +2,52 @@
 
 {PROJECT_DESCRIPTION}
 
-## 技術スタック
-
-{TECH_STACK}
-
-## リポジトリ構造（重要）
-
-`doc/` と `src/` は**別の git リポジトリ**。
+## リポジトリ構造
 
 ```
 {PROJECT_NAME}/
-├── doc/   → github.com/{GITHUB_USER}/{PROJECT_NAME}-docs
-└── src/   → github.com/{GITHUB_USER}/{PROJECT_NAME}
+├── .claude/   → github.com/{GITHUB_USER}/{PROJECT_NAME}-claude
+└── src/       → github.com/{GITHUB_USER}/{PROJECT_NAME}
 ```
+
+## .claude/ 構造
+
+```
+.claude/
+├── CLAUDE.md          ← このファイル（目次）
+├── settings.json
+├── rules/             ← コーディングルール（種別ごとに分割）
+│   ├── git.md
+│   ├── testing.md
+│   └── security.md
+├── docs/              ← プロジェクトドキュメント（ドメイン知識）
+│   ├── domain/        ← 用語・概念辞書
+│   ├── decision/      ← ADR（設計意思決定の記録）
+│   ├── architecture/  ← アーキテクチャ・構成図
+│   ├── runbook/       ← 運用手順書
+│   └── observability/ ← ログ・監視設計
+├── agents/            ← サブエージェント定義
+├── skills/            ← カスタムスキル
+└── commands/          ← カスタムスラッシュコマンド
+```
+
+## 技術スタック
+
+{TECH_STACK}
 
 ## 開発コマンド（src/ で実行）
 
 ```bash
 {DEV_COMMANDS}
 ```
+
+## ルール参照
+
+| 種別 | ファイル |
+|------|---------|
+| Git | `.claude/rules/git.md` |
+| テスト | `.claude/rules/testing.md` |
+| セキュリティ | `.claude/rules/security.md` |
 
 ## Supabase
 

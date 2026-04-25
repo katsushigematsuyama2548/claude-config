@@ -14,8 +14,7 @@ description: 新しいプロジェクトを標準構造で立ち上げる。GitH
 3. **技術スタック**（複数選択可: React Native / Next.js / Swift / Python / その他）
 4. **Supabase を使うか**（Yes / No）
 5. **Cloudflare Workers を使うか**（Yes / No）
-6. **doc リポジトリも作るか**（Yes / No）
-7. **GitHub の visibility**（public / private）
+6. **GitHub の visibility**（public / private）
 
 ヒアリング完了後、以下の手順を実行する。
 
@@ -27,11 +26,6 @@ mkdir ~/Documents/dev/{PROJECT_NAME}
 
 ```bash
 mkdir ~/Documents/dev/{PROJECT_NAME}/src
-```
-
-doc リポジトリを作る場合:
-```bash
-mkdir ~/Documents/dev/{PROJECT_NAME}/doc
 ```
 
 ## Step 3: .claude/ テンプレートをコピー
@@ -56,9 +50,8 @@ cp -r ~/.claude/templates/project-claude ~/Documents/dev/{PROJECT_NAME}/.claude
 gh repo create {PROJECT_NAME} --{visibility} --description "{PROJECT_DESCRIPTION}"
 ```
 
-doc リポジトリを作る場合:
 ```bash
-gh repo create {PROJECT_NAME}-docs --{visibility} --description "{PROJECT_DESCRIPTION} - docs"
+gh repo create {PROJECT_NAME}-claude --{visibility} --description "{PROJECT_DESCRIPTION} - claude config"
 ```
 
 ## Step 6: src/ の git 初期化と初回プッシュ
@@ -95,43 +88,35 @@ git commit -m "chore: initial setup"
 git push -u origin main
 ```
 
-## Step 7: doc/ の git 初期化と初回プッシュ（作成する場合）
+## Step 7: .claude/ の git 初期化と初回プッシュ
 
 ```bash
-cd ~/Documents/dev/{PROJECT_NAME}/doc
+git -C ~/Documents/dev/{PROJECT_NAME}/.claude init
 ```
 
 ```bash
-git init
+git -C ~/Documents/dev/{PROJECT_NAME}/.claude branch -M main
 ```
 
 ```bash
-git branch -M main
+git -C ~/Documents/dev/{PROJECT_NAME}/.claude remote add origin https://github.com/katsushigematsuyama2548/{PROJECT_NAME}-claude.git
 ```
 
 ```bash
-git remote add origin https://github.com/katsushigematsuyama2548/{PROJECT_NAME}-docs.git
+git -C ~/Documents/dev/{PROJECT_NAME}/.claude add -A
 ```
 
 ```bash
-echo "# {PROJECT_NAME} docs" > README.md
+git -C ~/Documents/dev/{PROJECT_NAME}/.claude commit -m "chore: initial setup"
 ```
 
 ```bash
-git add README.md
-```
-
-```bash
-git commit -m "chore: initial setup"
-```
-
-```bash
-git push -u origin main
+git -C ~/Documents/dev/{PROJECT_NAME}/.claude push -u origin main
 ```
 
 ## Step 8: 完了報告
 
 セットアップ完了後、以下を報告する：
 - 作成したディレクトリパス
-- GitHub リポジトリ URL（src / doc）
+- GitHub リポジトリ URL（src / .claude）
 - 次にやること（Supabase Project Ref の設定、技術スタックのインストール等）
