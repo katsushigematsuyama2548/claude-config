@@ -30,6 +30,7 @@ statusline-command.sh
 
 # キャッシュファイル（ルート）
 history.jsonl
+skill-usage.jsonl
 mcp-needs-auth-cache.json
 stats-cache.json
 project-config.json

@@ -7,74 +7,79 @@ description: ~/.claude/ とプロジェクト .claude/ の陳腐化ファイル�
 
 ## 概要
 
-60日以上更新されていない skills/rules/docs ファイル、90日以上更新されていない agents ファイルを検出し、GitHub PR を通じて削除を提案する。
+長期間**使われていない** skills / commands / agents ファイルを検出し、GitHub PR を通じて削除を提案する。
 
 ```
-陳腐化ファイルを検出
+最終使用日を取得（ログ優先 → git log フォールバック）
   ↓
-ユーザーに一覧を確認
+閾値超過ファイルを一覧表示
   ↓
-承認されたファイルそれぞれに 1 PR を作成
-（PR マージ → ファイル削除・ブランチ自動削除）
-（PR クローズ → 保持）
+ユーザー確認
+  ↓
+1 ファイル 1 PR を作成
+（マージ → 削除・ブランチ自動削除 / クローズ → 保持）
 ```
 
 ---
 
-## Step 1: 陳腐化ファイルの検出
+## Step 1: 使用日の取得方法
+
+### ローカル実行時（推奨）
+
+`~/.claude/skill-usage.jsonl` が存在する場合はこちらを優先する。
+各行は `{"skill":"retro","timestamp":"2026-04-25T04:35:00Z"}` 形式。
+
+```bash
+# skill-usage.jsonl から特定スキルの最終使用日を取得
+grep '"skill":"retro"' ~/.claude/skill-usage.jsonl | tail -1 | python3 -c "import sys,json; print(json.loads(sys.stdin.read())['timestamp'][:10])"
+```
+
+ログにエントリがないスキルは「一度も使われていない」とみなし、git log の初回コミット日を使用日とする。
+
+### リモートエージェント実行時（フォールバック）
+
+`skill-usage.jsonl` はローカルファイルのため、リモートでは参照不可。git の最終コミット日で代替する：
+
+```bash
+git log -1 --format="%ai" -- {FILE_PATH}
+```
+
+---
+
+## Step 2: 対象ディレクトリと閾値
 
 ### グローバル（~/.claude/）
 
-以下のディレクトリを対象にする：
-
 | ディレクトリ | 閾値 |
 |-------------|------|
-| `~/.claude/skills/` | 60日 |
-| `~/.claude/commands/` | 60日 |
-| `~/.claude/agents/` | 90日 |
-
-```bash
-find ~/.claude/skills ~/.claude/commands ~/.claude/agents -name "*.md" -not -path "*/MEMORY*"
-```
-
-各ファイルの最終更新日を確認：
-
-```bash
-git -C ~/.claude log -1 --format="%ai" -- {FILE_PATH}
-```
-
-git 履歴がないファイルは `stat` で確認：
-
-```bash
-stat -f "%Sm" -t "%Y-%m-%d" {FILE_PATH}
-```
+| `skills/` | 60日 |
+| `commands/` | 60日 |
+| `agents/` | 90日 |
 
 ### プロジェクト（.claude/）
 
-現在のプロジェクトディレクトリ（例: `~/Documents/dev/{PROJECT_NAME}`）がある場合：
-
 | ディレクトリ | 閾値 |
 |-------------|------|
-| `.claude/skills/` | 60日 |
-| `.claude/commands/` | 60日 |
-| `.claude/rules/` | 60日 |
-| `.claude/docs/` | 60日 |
-| `.claude/agents/` | 90日 |
+| `skills/` / `commands/` / `rules/` / `docs/` | 60日 |
+| `agents/` | 90日 |
+
+### 対象外（常に除外）
+
+- `CLAUDE.md`, `settings.json`, `README.md`, `.gitignore`, `templates/`
+- `commands/gc/`, `commands/retro/`, `commands/doc-ship/`, `commands/newproject/`
 
 ---
 
-## Step 2: 検出結果の表示
-
-陳腐化ファイルを一覧表示する：
+## Step 3: 検出結果の表示
 
 ```
-## 陳腐化ファイル一覧（GC 候補）
+## GC 候補一覧
 
 ### グローバル (~/.claude/)
-| ファイル | 最終更新 | 経過日数 | 閾値 |
-|---------|---------|---------|------|
-| skills/vercel-react-native-skills/SKILL.md | 2025-11-01 | 175日 | 60日 |
-| agents/expo-mobile-engineer.md | 2025-10-15 | 192日 | 90日 |
+| ファイル | 最終使用日 | 経過 | 判定根拠 | 閾値 |
+|---------|-----------|------|---------|------|
+| skills/vercel-react-native-skills | 2025-10-01 | 206日 | usage log | 60日 |
+| agents/expo-mobile-engineer.md   | 2025-11-15 | 161日 | git log  | 90日 |
 
 ### プロジェクト (.claude/)
 （なし）
@@ -82,23 +87,24 @@ stat -f "%Sm" -t "%Y-%m-%d" {FILE_PATH}
 PR を作成しますか？ (y / n / 個別指定)
 ```
 
-**0件の場合**: 「陳腐化ファイルは見つかりませんでした。」と伝えて終了する。
+0 件の場合は「陳腐化ファイルはありませんでした」と伝えて終了する。
 
 ---
 
-## Step 3: PR の作成（1 ファイル 1 PR）
+## Step 4: PR の作成（1 ファイル 1 PR）
 
-ユーザーが承認したファイルそれぞれについて、以下を実行する。
+承認されたファイルそれぞれに対して実行する。
 
 ### グローバルファイルの場合
 
-ブランチ名: `gc/{YYYY-MM-DD}/{sanitized-filename}`
+ブランチ名: `gc/{YYYY-MM-DD}/{sanitized-path}`
+（sanitized-path = パスの `/` を `-` に置換。例: `skills-vercel-react-native-skills`）
 
 ```bash
 cd ~/.claude
 git checkout main
 git pull
-git checkout -b gc/2026-04-25/skills-vercel-react-native-skills
+git checkout -b gc/2026-05-01/skills-vercel-react-native-skills
 ```
 
 ```bash
@@ -108,12 +114,12 @@ git rm -r skills/vercel-react-native-skills/
 
 ```bash
 cd ~/.claude
-git commit -m "gc: remove stale skills/vercel-react-native-skills (175 days)"
+git commit -m "gc: remove stale skills/vercel-react-native-skills (206 days unused)"
 ```
 
 ```bash
 cd ~/.claude
-git push -u origin gc/2026-04-25/skills-vercel-react-native-skills
+git push -u origin gc/2026-05-01/skills-vercel-react-native-skills
 ```
 
 ```bash
@@ -123,18 +129,15 @@ gh pr create \
   --body "## 削除提案
 
 **ファイル**: \`skills/vercel-react-native-skills/\`
-**最終更新**: 2025-11-01（175日前）
+**最終使用日**: 2025-10-01（206日前）
+**判定根拠**: usage log
 **閾値**: 60日
 
-このファイルは60日以上更新されておらず、使用されていない可能性があります。
-
-- **マージ** → ファイルを削除
-- **クローズ** → 保持（必要であれば内容を更新してください）" \
+- **マージ** → 削除（ブランチ自動削除）
+- **クローズ** → 保持（使い続ける場合は内容を更新してください）" \
   --base main \
-  --head gc/2026-04-25/skills-vercel-react-native-skills
+  --head gc/2026-05-01/skills-vercel-react-native-skills
 ```
-
-PR 作成後、main ブランチに戻る：
 
 ```bash
 cd ~/.claude
@@ -143,35 +146,31 @@ git checkout main
 
 ### プロジェクトファイルの場合
 
-ブランチ名: `claude/gc/{YYYY-MM-DD}/{sanitized-filename}`
-
-手順はグローバルと同様。`gh pr create` 時に `--repo` は不要（プロジェクトの git remote から自動検出）。
+ブランチ名: `claude/gc/{YYYY-MM-DD}/{sanitized-path}` で同様に実行する。`gh pr create` 時に `--repo` は不要。
 
 ---
 
-## Step 4: 完了報告
-
-全 PR を作成したら報告する：
+## Step 5: 完了報告
 
 ```
 ## GC 完了
 
 作成した PR：
-- https://github.com/katsushigematsuyama2548/claude-config/pull/XX — gc: remove stale skills/vercel-react-native-skills
-- https://github.com/katsushigematsuyama2548/claude-config/pull/YY — gc: remove stale agents/expo-mobile-engineer
+- https://github.com/katsushigematsuyama2548/claude-config/pull/XX
+- https://github.com/katsushigematsuyama2548/claude-config/pull/YY
 
 各 PR をレビューして：
-- マージ → ファイル削除（ブランチも自動削除）
+- マージ → 削除（ブランチ自動削除）
 - クローズ → 保持
 
-次回 /gc は {今日から60日後} の実行を推奨します。
+次回 /gc 推奨: {今日から60日後}
 ```
 
 ---
 
-## 注意事項
+## 補足: skill-usage.jsonl について
 
-- `CLAUDE.md`、`settings.json`、`README.md`、`.gitignore` は対象外
-- `templates/` 配下は対象外
-- `commands/` 配下のスキル自身（gc, retro, doc-ship, newproject）は対象外
-- PR を作成するだけで、実際のファイル削除はマージ時に行われる
+- 場所: `~/.claude/skill-usage.jsonl`（ローカルのみ・git 管理外）
+- 書き込み: `Skill` ツール実行後に `PostToolUse` フックが自動追記
+- フォーマット: `{"skill":"retro","timestamp":"2026-04-25T04:35:00Z"}`
+- リモートエージェント（月次スケジュール）では参照不可のため git log で代替
