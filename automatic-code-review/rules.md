@@ -1,0 +1,1 @@
+/Users/katusigematuyama/Documents/dev/flashguard/src/.claude/automatic-code-review/rules.md
