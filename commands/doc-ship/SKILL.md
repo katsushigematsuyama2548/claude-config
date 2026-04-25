@@ -1,6 +1,6 @@
 ---
 name: doc-ship
-description: .claude/ への変更をブランチ作成 → PR → マージで反映する。/retro の最後に呼び出す。グローバル（~/.claude/）とプロジェクト（.claude/）の両方に対応。
+description: .claude/ への変更をブランチ作成 → PR 作成（open）で反映する。マージは GitHub 上でユーザーが行う。グローバル（~/.claude/）とプロジェクト（.claude/）の両方に対応。
 ---
 
 # Doc Ship Skill
@@ -8,6 +8,7 @@ description: .claude/ への変更をブランチ作成 → PR → マージで�
 ## Overview
 
 `/retro` で承認された `.claude/` への変更を GitHub 経由で安全に反映する。
+PR は **open のまま作成**し、マージは GitHub 上でユーザーが行う。
 
 ```
 変更ファイルを確認
@@ -18,9 +19,9 @@ description: .claude/ への変更をブランチ作成 → PR → マージで�
   ↓
 コミット
   ↓
-PR 作成
+PR 作成（open のまま）
   ↓
-マージ
+URL を報告して終了
 ```
 
 ---
@@ -41,55 +42,41 @@ PR 作成
 ## Step 2: グローバル変更の ship（~/.claude/ が対象の場合）
 
 ```bash
-cd ~/.claude
-git status
+git -C ~/.claude status
 ```
 
-ブランチ名は `retro/YYYY-MM-DD` 形式：
+ブランチ名は `retro/YYYY-MM-DD/{slug}` 形式：
 
 ```bash
-cd ~/.claude
-git checkout -b retro/2026-04-25
+git -C ~/.claude checkout -b retro/2026-04-25/fix-something
 ```
 
 ```bash
-cd ~/.claude
-git add -A
+git -C ~/.claude add {変更ファイル}
 ```
 
 ```bash
-cd ~/.claude
-git commit -m "retro: （変更内容の要約）"
+git -C ~/.claude commit -m "retro: （変更内容の要約）"
 ```
 
 ```bash
-cd ~/.claude
-git push -u origin retro/2026-04-25
+git -C ~/.claude push -u origin retro/2026-04-25/fix-something
 ```
 
-PR を作成（変更内容の要約を本文に記載）：
+PR を作成（open のまま）：
 
 ```bash
 gh pr create --repo katsushigematsuyama2548/claude-config \
   --title "retro: （変更内容の要約）" \
-  --body "## 変更内容\n\n（/retro で承認された提案の一覧）" \
+  --body "## 変更内容\n\n（/retro で承認された提案の内容）" \
   --base main \
-  --head retro/2026-04-25
-```
-
-マージ：
-
-```bash
-gh pr merge {PR番号} --repo katsushigematsuyama2548/claude-config \
-  --squash --delete-branch
+  --head retro/2026-04-25/fix-something
 ```
 
 main に戻る：
 
 ```bash
-cd ~/.claude
-git checkout main
-git pull
+git -C ~/.claude checkout main
 ```
 
 ---
@@ -98,15 +85,15 @@ git pull
 
 現在のプロジェクト名を確認し、作業ディレクトリに移動する。
 
-ブランチ名は `claude/retro/YYYY-MM-DD` 形式：
+ブランチ名は `claude/retro/YYYY-MM-DD/{slug}` 形式：
 
 ```bash
 cd ~/Documents/dev/{PROJECT_NAME}/src
-git checkout -b claude/retro/2026-04-25
+git checkout -b claude/retro/2026-04-25/fix-something
 ```
 
 ```bash
-git add .claude/
+git add .claude/{変更ファイル}
 ```
 
 ```bash
@@ -114,22 +101,17 @@ git commit -m "claude: retro（変更内容の要約）"
 ```
 
 ```bash
-git push -u origin claude/retro/2026-04-25
+git push -u origin claude/retro/2026-04-25/fix-something
 ```
 
 ```bash
 gh pr create \
   --title "claude: retro（変更内容の要約）" \
-  --body "## 変更内容\n\n（/retro で承認された提案の一覧）" \
+  --body "## 変更内容\n\n（/retro で承認された提案の内容）" \
   --base main \
-  --head claude/retro/2026-04-25
-```
-
-```bash
-gh pr merge --squash --delete-branch
+  --head claude/retro/2026-04-25/fix-something
 ```
 
 ```bash
 git checkout main
-git pull
 ```

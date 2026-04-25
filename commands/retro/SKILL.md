@@ -89,7 +89,7 @@ Apply: 承認された変更を実際に適用
 
 ## Step 4: 適用（提案ごとに個別 PR）
 
-承認された提案を **1 つずつ** 処理する。各提案について「ファイル適用 → ブランチ → PR → マージ」を完結させてから次へ進む。
+承認された提案を **1 つずつ** 処理する。PR は open のまま作成し、マージは GitHub 上でユーザーが行う。
 
 ### グローバル変更（~/.claude/）の場合
 
@@ -109,23 +109,20 @@ git -C ~/.claude commit -m "retro: （提案タイトル）"
 # 4. プッシュ
 git -C ~/.claude push -u origin retro/2026-04-25/fix-doc-ship-pr-merge
 
-# 5. PR 作成
+# 5. PR 作成（open のまま — GitHub でユーザーがマージ）
 gh pr create --repo katsushigematsuyama2548/claude-config \
   --title "retro: （提案タイトル）" \
   --body "## 変更内容\n\n（提案の内容）" \
   --base main \
   --head retro/2026-04-25/fix-doc-ship-pr-merge
 
-# 6. PR 番号を確認してマージ（出力された PR URL から番号を取得）
-gh pr merge {PR番号} --repo katsushigematsuyama2548/claude-config \
-  --squash --delete-branch
-
-# 7. main に戻る
+# 6. main に戻る
 git -C ~/.claude checkout main
-git -C ~/.claude pull
 ```
 
 → **次の提案へ繰り返す**
+
+全提案の PR を作成したら URL 一覧を報告して終了する。
 
 ### プロジェクト変更（.claude/）の場合
 
@@ -141,7 +138,5 @@ gh pr create --title "claude: retro（提案タイトル）" \
   --body "## 変更内容\n\n（提案の内容）" \
   --base main \
   --head claude/retro/2026-04-25/fix-something
-gh pr merge {PR番号} --squash --delete-branch
 git checkout main
-git pull
 ```
