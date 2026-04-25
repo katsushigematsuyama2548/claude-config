@@ -106,10 +106,15 @@ git -C ~/.claude checkout -b retro/2026-04-25/fix-doc-ship-pr-merge
 git -C ~/.claude add {変更ファイルパス}
 git -C ~/.claude commit -m "retro: （提案タイトル）"
 
-# 4. プッシュ
+# 4. コンフリクト確認（push 前に rebase）
+git -C ~/.claude fetch origin
+git -C ~/.claude rebase origin/main
+# コンフリクトが出た場合は解消してから続行
+
+# 5. プッシュ
 git -C ~/.claude push -u origin retro/2026-04-25/fix-doc-ship-pr-merge
 
-# 5. PR 作成（open のまま — GitHub でユーザーがマージ）
+# 6. PR 作成（open のまま — GitHub でユーザーがマージ）
 gh pr create --repo katsushigematsuyama2548/claude-config \
   --title "retro: （提案タイトル）" \
   --body "## 変更内容\n\n（提案の内容）" \
@@ -144,6 +149,8 @@ cd ~/Documents/dev/{PROJECT_NAME}/src
 git checkout -b claude/retro/2026-04-25/fix-something
 git add .claude/{変更ファイル}
 git commit -m "claude: retro（提案タイトル）"
+git fetch origin
+git rebase origin/main
 git push -u origin claude/retro/2026-04-25/fix-something
 gh pr create --title "claude: retro（提案タイトル）" \
   --body "## 変更内容\n\n（提案の内容）" \

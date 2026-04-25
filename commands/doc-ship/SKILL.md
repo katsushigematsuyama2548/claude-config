@@ -60,6 +60,11 @@ git -C ~/.claude commit -m "retro: （変更内容の要約）"
 ```
 
 ```bash
+git -C ~/.claude fetch origin
+git -C ~/.claude rebase origin/main
+```
+
+```bash
 git -C ~/.claude push -u origin retro/2026-04-25/fix-something
 ```
 
@@ -98,6 +103,11 @@ git add .claude/{変更ファイル}
 
 ```bash
 git commit -m "claude: retro（変更内容の要約）"
+```
+
+```bash
+git fetch origin
+git rebase origin/main
 ```
 
 ```bash
