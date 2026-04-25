@@ -70,6 +70,8 @@ Apply: 承認された変更を実際に適用
 - `~/.claude/skills/` または `.claude/skills/` — 繰り返し作業を新スキル化
 - `~/.claude/agents/` — エージェント定義の改善・知識追加
 - `~/.claude/commands/` または `.claude/commands/` — 新コマンドの追加
+- `.claude/rules/` — ファイルパスに応じて自動ロードされるルール（例: `rules/supabase.md`）
+- `.claude/docs/` — ドメイン知識・設計書・注意事項など参照用ドキュメント
 - `.claude/CLAUDE.md` — プロジェクト固有の注意事項・コンテキスト追加
 - `~/.claude/CLAUDE.md` — 全プロジェクト共通のルール追加（3行を超えないよう注意）
 
@@ -91,11 +93,5 @@ Apply: 承認された変更を実際に適用
 
 - **新規ファイル** → Write ツールで作成
 - **既存ファイルへの追記** → Edit ツールで更新
-- グローバルへの変更（`~/.claude/`）は、適用後に以下でコミット・プッシュする：
 
-```bash
-cd ~/.claude
-git add -A
-git commit -m "retro: （変更内容の要約）"
-git push
-```
+ファイルの適用が完了したら、**`/doc-ship` を実行**してブランチ作成 → PR → マージを行う。
