@@ -80,7 +80,7 @@ gh pr create --repo katsushigematsuyama2548/claude-config \
 マージ：
 
 ```bash
-gh pr merge --repo katsushigematsuyama2548/claude-config \
+gh pr merge {PR番号} --repo katsushigematsuyama2548/claude-config \
   --squash --delete-branch
 ```
 
