@@ -1,0 +1,44 @@
+# superpowers が自動生成するファイル
+docs/superpowers/
+
+# セッション・キャッシュ（自動生成）
+projects/
+sessions/
+session-env/
+cache/
+logs/
+debug/
+statsig/
+telemetry/
+paste-cache/
+file-history/
+shell-snapshots/
+backups/
+downloads/
+ide/
+chrome/
+tasks/
+todos/
+plans/
+
+# 個人情報・認証情報
+settings.local.json
+**/settings.local.json
+**/*token*
+**/*secret*
+statusline-command.sh
+
+# キャッシュファイル（ルート）
+history.jsonl
+skill-usage.jsonl
+mcp-needs-auth-cache.json
+stats-cache.json
+project-config.json
+
+# プラグインキャッシュ（data/ 以外）
+plugins/cache/
+plugins/repos/
+plugins/marketplaces/
+
+# OS
+.DS_Store
