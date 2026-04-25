@@ -127,19 +127,6 @@ git -C ~/.claude checkout main
 
 → **次の提案へ繰り返す**
 
-全提案の PR を作成したら URL 一覧を報告する。
-
----
-
-## Step 5: GC チェック
-
-全提案の適用が完了したら、Skill ツールで `gc` スキルを呼び出す。
-
-- 候補なし → セッション完了
-- 候補あり → GC スキルの指示に従い、ユーザー確認の上 PR を作成する
-
----
-
 ### プロジェクト変更（.claude/）の場合
 
 ブランチ名: `claude/retro/YYYY-MM-DD/{proposal-slug}`
@@ -158,3 +145,16 @@ gh pr create --title "claude: retro（提案タイトル）" \
   --head claude/retro/2026-04-25/fix-something
 git checkout main
 ```
+
+→ **次の提案へ繰り返す**
+
+全提案の PR を作成したら URL 一覧を報告する。
+
+---
+
+## Step 5: GC チェック
+
+全提案の適用が完了したら、Skill ツールで `gc` スキルを呼び出す。
+
+- 候補なし → セッション完了
+- 候補あり → GC スキルの指示に従い、ユーザー確認の上 PR を作成する
