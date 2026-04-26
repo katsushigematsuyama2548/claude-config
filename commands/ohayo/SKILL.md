@@ -47,7 +47,7 @@ find ~/claude/dev/active -name "CLAUDE.md" -maxdepth 2
 各案件の origin パスに対して:
 
 ```bash
-python3 ~/claude/scripts/read_wbs.py "{origin_path}"
+python3 ~/.claude/scripts/read_wbs.py "{origin_path}"
 ```
 
 JSON 出力から以下の条件でタスクを抽出（担当 = 松山）:
