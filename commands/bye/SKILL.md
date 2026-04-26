@@ -39,7 +39,7 @@ find ~/claude/dev/active -name "CLAUDE.md" -maxdepth 2
 各 origin パスに対して:
 
 ```bash
-python3 ~/claude/scripts/read_wbs.py "{origin_path}"
+python3 ~/.claude/scripts/read_wbs.py "{origin_path}"
 ```
 
 ## Step 3: 更新箇所を判断する
@@ -49,7 +49,7 @@ task.md の完了タスク（`[x]`）と WBS を照合し、進捗ステータ�
 ## Step 4: draft WBS をデスクトップに作成
 
 ```bash
-python3 ~/claude/scripts/update_wbs.py \
+python3 ~/.claude/scripts/update_wbs.py \
   "{origin_path}" \
   "/mnt/c/Users/kmatuyama/Desktop/wbs.xlsm" \
   '{updates_json}'
